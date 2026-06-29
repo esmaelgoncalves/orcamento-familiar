@@ -1,0 +1,5 @@
+1. Apps Scripts > Novo Projeto
+2. Copiar conteúdo arquivo script.js para o arquivo Código.gs
+3. No Projeto App Script, criar novo arquivo do tipo html, nomear como "Index" (não precisa adicionar a extensão .html)
+4. Copiar conteúdo do arquivo Index.html para o arquivo Index.html criado no App Script
+5. Implantar > Nova Implantação > Tipo de implantação: Aplicativo da Web
