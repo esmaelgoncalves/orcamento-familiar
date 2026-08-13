@@ -60,6 +60,7 @@ select { width: 180px; }
 .tag-pix { background: #00bcd433; color: #4dd0e1; }
 .tag-boleto { background: #ff980033; color: #ffb74d; }
 .tag-debito { background: #66bb6a33; color: #81c784; }
+.tag-vale-alimentacao, .tag-vale-refeicao { background: #22c55e33; color: #86efac; }
 .config-section { margin-bottom: 32px; }
 .chip-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #263238; border-radius: 16px; font-size: 0.8rem; }
@@ -159,6 +160,7 @@ input:focus, select:focus { border-color: var(--primary); }
 .tag-pix { color: var(--cyan-text); }
 .tag-boleto, .parcela-info { color: var(--warning-text); }
 .tag-debito { color: var(--positive-hover); }
+.tag-vale-alimentacao, .tag-vale-refeicao { color: var(--positive-hover); }
 .btn-toggle { border-color: var(--primary); color: var(--primary); }
 .btn-toggle.active { background: var(--primary); color: var(--primary-contrast); }
 
@@ -432,6 +434,90 @@ th:last-child { border-top-right-radius: 8px; }
   color: var(--muted);
   font-size: .9rem;
 }
+.home-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(260px, .65fr);
+  gap: 18px;
+  margin-bottom: 18px;
+}
+.home-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: var(--shadow-soft);
+}
+.home-title {
+  margin: 0 0 6px;
+  font-size: 1.65rem;
+  line-height: 1.15;
+  color: var(--text);
+}
+.home-subtitle {
+  margin: 0;
+  max-width: 760px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.home-health {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 142px;
+}
+.home-health-pill {
+  align-self: flex-start;
+  border-radius: 999px;
+  padding: 5px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--muted-2);
+  font-size: .78rem;
+  font-weight: 700;
+}
+.home-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+.home-actions .btn {
+  width: 100%;
+  min-height: 42px;
+}
+.home-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+}
+.home-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.home-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.home-list-item:last-child { border-bottom: none; }
+.home-list-label {
+  color: var(--muted-2);
+  font-size: .86rem;
+}
+.home-list-value {
+  font-weight: 750;
+  white-space: nowrap;
+}
+.home-list-value.positive { color: var(--positive); }
+.home-list-value.negative { color: var(--negative); }
+.home-list-value.neutral { color: var(--primary); }
+.home-empty {
+  color: var(--muted);
+  font-size: .88rem;
+}
 body.sidebar-collapsed .app { grid-template-columns: 0 minmax(0, 1fr); }
 body.sidebar-collapsed .tabs {
   padding-left: 0;
@@ -451,6 +537,9 @@ body.sidebar-collapsed .content { grid-column: 1 / -1; }
   .page-heading { margin-bottom: 14px; padding-bottom: 12px; }
   .page-heading h2 { font-size: 1.25rem; }
   .page-heading p { font-size: .85rem; }
+  .home-hero, .home-split { grid-template-columns: 1fr; }
+  .home-panel { padding: 14px; box-shadow: none; }
+  .home-title { font-size: 1.35rem; }
   .tabs {
     position: fixed;
     bottom: 0;
@@ -489,7 +578,8 @@ body.sidebar-collapsed .content { grid-column: 1 / -1; }
 <div class="header-status"><span id="fileStatus"></span></div>
 </div>
 <div class="tabs">
-<div class="tab active" onclick="switchTab('config')">Configuração</div>
+<div class="tab active" onclick="switchTab('home')">Home</div>
+<div class="tab" onclick="switchTab('config')">Configuração</div>
 <div class="tab" onclick="switchTab('entradas')">Entradas</div>
 <div class="tab" onclick="switchTab('saidas')">Saídas</div>
 <div class="tab" onclick="switchTab('investimentos')">Investimentos</div>
@@ -500,12 +590,49 @@ body.sidebar-collapsed .content { grid-column: 1 / -1; }
 <div class="page-heading">
 <div>
 <div class="page-eyebrow">Orçamento Familiar</div>
-<h2 id="pageTitle">Configuração</h2>
-<p id="pageSubtitle">Categorias, cartões, recorrências e preferências do app.</p>
+<h2 id="pageTitle">Home</h2>
+<p id="pageSubtitle">Leitura rápida do mês, saldo livre e próximos movimentos.</p>
+</div>
+</div>
+<!-- HOME -->
+<div id="home" class="panel active">
+<div class="home-hero">
+<div class="home-panel">
+<h3 class="home-title" id="home-title">Visão do mês</h3>
+<p class="home-subtitle" id="home-subtitle"></p>
+<div class="home-actions" style="margin-top:18px">
+<button class="btn btn-primary" onclick="switchTab('entradas')">Nova Entrada</button>
+<button class="btn btn-primary" onclick="switchTab('saidas')">Nova Saída</button>
+<button class="btn btn-primary" onclick="switchTab('investimentos')">Investimento</button>
+<button class="btn" style="background:var(--surface-2);color:var(--text)" onclick="switchTab('dashboard-mensal')">Dashboard Mensal</button>
+</div>
+</div>
+<div class="home-panel home-health">
+<div class="home-health-pill" id="home-health-pill">Sem dados no mês</div>
+<div>
+<div class="card-label">Saldo Livre Projetado</div>
+<div class="card-value" id="home-saldo-projetado">R$ 0,00</div>
+</div>
+<div>
+<div class="card-label">Taxa de Poupança</div>
+<div class="card-value neutral" id="home-taxa-poupanca">0%</div>
+</div>
+</div>
+</div>
+<div class="cards-grid" id="home-cards"></div>
+<div class="home-split">
+<div class="home-panel">
+<div class="chart-title">Composição do mês</div>
+<div class="bar-chart" id="home-composicao"></div>
+</div>
+<div class="home-panel">
+<div class="chart-title">Principais movimentos</div>
+<div class="home-list" id="home-movimentos"></div>
+</div>
 </div>
 </div>
 <!-- CONFIG -->
-<div id="config" class="panel active">
+<div id="config" class="panel">
 <div class="config-section">
 <div class="section-title">Preferências e Dados</div>
 <div class="form-row">
@@ -530,6 +657,13 @@ body.sidebar-collapsed .content { grid-column: 1 / -1; }
 <button class="btn btn-primary" onclick="addCategory('saida')">Adicionar</button>
 </div>
 <div class="chip-list" id="chips-saida"></div>
+<div class="section-title" style="font-size:0.9rem;margin-top:24px">Subcategorias de Saída</div>
+<div class="form-row">
+<div class="form-group"><label>Categoria</label><select id="subcatSaidaCat" onchange="renderSubcategoryChips()"></select></div>
+<div class="form-group"><label>Nova subcategoria</label><input type="text" id="newSaidaSubcat" placeholder="Ex: Mercado, Padaria, Delivery"></div>
+<button class="btn btn-primary" onclick="addSubcategory()">Adicionar</button>
+</div>
+<div class="chip-list" id="chips-subcat-saida"></div>
 </div>
 <div class="config-section">
 <div class="section-title">Categorias de Investimento</div>
@@ -561,7 +695,7 @@ body.sidebar-collapsed .content { grid-column: 1 / -1; }
 <div class="form-group"><label>Dia Vencimento</label><input type="number" id="recDia" min="1" max="31" placeholder="5"></div>
 <div class="form-group"><label>Forma Pgto</label>
 <select id="recForma">
-<option value="pix">PIX</option><option value="debito">Débito</option><option value="boleto">Boleto</option><option value="cartao">Cartão</option>
+<option value="pix">PIX</option><option value="debito">Débito</option><option value="boleto">Boleto</option><option value="cartao">Cartão</option><option value="vale_alimentacao">Vale Alimentação</option><option value="vale_refeicao">Vale Refeição</option>
 </select></div>
 <div class="form-group"><label>Cartão (se aplicável)</label><select id="recCartao"><option value="">-</option></select></div>
 <button class="btn btn-primary" onclick="addRecorrente()">Adicionar</button>
@@ -616,7 +750,8 @@ body.sidebar-collapsed .content { grid-column: 1 / -1; }
 <div class="section-title">Registrar Despesa</div>
 <div class="form-row">
 <div class="form-group"><label>Data Compra</label><input type="date" id="saidaData"></div>
-<div class="form-group"><label>Categoria</label><select id="saidaCat"></select></div>
+<div class="form-group"><label>Categoria</label><select id="saidaCat" onchange="updateSaidaSubcatOptions()"></select></div>
+<div class="form-group"><label>Subcategoria</label><select id="saidaSubcat"></select></div>
 <div class="form-group"><label>Descrição</label><input type="text" id="saidaDesc" placeholder="Descrição"></div>
 <div class="form-group"><label>Valor Total (R$)</label><input type="number" id="saidaValor" step="0.01" placeholder="0,00"></div>
 <div class="form-group"><label>Forma Pagamento</label>
@@ -625,6 +760,8 @@ body.sidebar-collapsed .content { grid-column: 1 / -1; }
 <option value="debito">Débito</option>
 <option value="boleto">Boleto</option>
 <option value="cartao">Cartão de Crédito</option>
+<option value="vale_alimentacao">Vale Alimentação</option>
+<option value="vale_refeicao">Vale Refeição</option>
 </select>
 </div>
 <div class="form-group" id="cartaoGroup" style="display:none"><label>Cartão</label><select id="saidaCartao"></select></div>
@@ -634,8 +771,9 @@ body.sidebar-collapsed .content { grid-column: 1 / -1; }
 <div class="section-title" style="font-size:0.9rem;margin-top:24px">Filtros</div>
 <div class="form-row">
 <div class="form-group"><label>Buscar</label><input type="text" id="filtroSaidaTexto" placeholder="Descrição..." oninput="renderSaidas()"></div>
-<div class="form-group"><label>Categoria</label><select id="filtroSaidaCat" onchange="renderSaidas()"><option value="">Todas</option></select></div>
-<div class="form-group"><label>Forma Pgto</label><select id="filtroSaidaForma" onchange="renderSaidas()"><option value="">Todas</option><option value="pix">PIX</option><option value="debito">Débito</option><option value="boleto">Boleto</option><option value="cartao">Cartão</option></select></div>
+<div class="form-group"><label>Categoria</label><select id="filtroSaidaCat" onchange="updateFiltroSaidaSubcatOptions();renderSaidas()"><option value="">Todas</option></select></div>
+<div class="form-group"><label>Subcategoria</label><select id="filtroSaidaSubcat" onchange="renderSaidas()"><option value="">Todas</option></select></div>
+<div class="form-group"><label>Forma Pgto</label><select id="filtroSaidaForma" onchange="renderSaidas()"><option value="">Todas</option><option value="pix">PIX</option><option value="debito">Débito</option><option value="boleto">Boleto</option><option value="cartao">Cartão</option><option value="vale_alimentacao">Vale Alimentação</option><option value="vale_refeicao">Vale Refeição</option></select></div>
 <div class="form-group"><label>Compra De</label><input type="month" id="filtroSaidaCompraDe" onchange="renderSaidas()"></div>
 <div class="form-group"><label>Compra Até</label><input type="month" id="filtroSaidaCompraAte" onchange="renderSaidas()"></div>
 <div class="form-group"><label>Competência De</label><input type="month" id="filtroSaidaDe" onchange="renderSaidas()"></div>
@@ -643,7 +781,7 @@ body.sidebar-collapsed .content { grid-column: 1 / -1; }
 <button class="btn" style="background:#546e7a;color:#fff" onclick="clearFiltrosSaida()">Limpar</button>
 </div>
 <table id="saidas-table">
-<thead><tr><th class="sortable" data-sort-table="saidas" data-sort-key="data">Data Compra</th><th class="sortable" data-sort-table="saidas" data-sort-key="competencia">Competência</th><th class="sortable" data-sort-table="saidas" data-sort-key="categoria">Categoria</th><th class="sortable" data-sort-table="saidas" data-sort-key="descricao">Descrição</th><th class="sortable" data-sort-table="saidas" data-sort-key="valor">Valor Parcela</th><th class="sortable" data-sort-table="saidas" data-sort-key="forma">Pagamento</th><th class="sortable" data-sort-table="saidas" data-sort-key="parcela">Parcela</th><th></th></tr></thead>
+<thead><tr><th class="sortable" data-sort-table="saidas" data-sort-key="data">Data Compra</th><th class="sortable" data-sort-table="saidas" data-sort-key="competencia">Competência</th><th class="sortable" data-sort-table="saidas" data-sort-key="categoria">Categoria</th><th class="sortable" data-sort-table="saidas" data-sort-key="subcategoria">Subcategoria</th><th class="sortable" data-sort-table="saidas" data-sort-key="descricao">Descrição</th><th class="sortable" data-sort-table="saidas" data-sort-key="valor">Valor Parcela</th><th class="sortable" data-sort-table="saidas" data-sort-key="forma">Pagamento</th><th class="sortable" data-sort-table="saidas" data-sort-key="parcela">Parcela</th><th></th></tr></thead>
 <tbody></tbody>
 </table>
 <div id="saidas-summary" style="margin-top:12px;font-size:0.85rem;color:#90a4ae"></div>
@@ -749,6 +887,7 @@ body.sidebar-collapsed .content { grid-column: 1 / -1; }
 <script>
 const DEFAULT_DATA = {
   categorias: { entrada: ['Salário','Freelance','Rendimentos'], saida: ['Alimentação','Moradia','Transporte','Saúde','Lazer','Educação'], invest: ['Renda Fixa','Ações','FIIs','Crypto'] },
+  subcategorias: { saida: {} },
   cartoes: [],
   recorrentes: [],
   metas: [],
@@ -762,6 +901,10 @@ let data = JSON.parse(localStorage.getItem('orcamento_familiar') || 'null') || s
 function migrateData() {
   if(!data.recorrentes) data.recorrentes = [];
   if(!data.metas) data.metas = [];
+  if(!data.subcategorias) data.subcategorias = { saida: {} };
+  if(!data.subcategorias.saida) data.subcategorias.saida = {};
+  (data.categorias?.saida || []).forEach(cat => { if(!data.subcategorias.saida[cat]) data.subcategorias.saida[cat] = []; });
+  (data.saidas || []).forEach(s => { if(s.subcategoria === undefined) s.subcategoria = ''; });
 }
 migrateData();
 
@@ -826,9 +969,10 @@ function showFileStatus(msg, isError) {
   if(!isError) setTimeout(()=>{ if(el.textContent===msg) el.textContent='● Google Apps Script'; }, 3000);
 }
 
-function reloadAll() { renderChips(); renderCards(); refreshSelects(); renderEntradas(); renderSaidas(); renderInvest(); }
+function reloadAll() { renderHome(); renderChips(); renderCards(); refreshSelects(); renderEntradas(); renderSaidas(); renderInvest(); }
 
 const pageMeta = {
+  home: ['Home', 'Leitura rápida do mês, saldo livre e próximos movimentos.'],
   config: ['Configuração', 'Categorias, cartões, recorrências e preferências do app.'],
   entradas: ['Entradas', 'Receitas registradas por período, categoria e descrição.'],
   saidas: ['Saídas', 'Despesas por compra, competência, forma de pagamento e parcelas.'],
@@ -853,9 +997,10 @@ function switchTab(id) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  const tabMap = {'config':0,'entradas':1,'saidas':2,'investimentos':3,'dashboard-mensal':4,'dashboard-anual':5};
+  const tabMap = {'home':0,'config':1,'entradas':2,'saidas':3,'investimentos':4,'dashboard-mensal':5,'dashboard-anual':6};
   document.querySelectorAll('.tab')[tabMap[id]].classList.add('active');
   updatePageHeader(id);
+  if(id==='home') renderHome();
   if(id==='dashboard-mensal') renderDashboardMensal();
   if(id==='dashboard-anual') renderDashboardAnual();
   refreshSelects();
@@ -863,6 +1008,15 @@ function switchTab(id) {
 
 function fmt(v) { return 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}); }
 function fmtDate(d) { if(!d) return '-'; const [y,m,day]=d.split('-'); return `${day}/${m}/${y}`; }
+const FORMA_LABELS = { pix:'PIX', debito:'Débito', boleto:'Boleto', cartao:'Cartão', vale_alimentacao:'Vale Alimentação', vale_refeicao:'Vale Refeição' };
+const BENEFIT_FORMS = ['vale_alimentacao', 'vale_refeicao'];
+function formaLabel(forma) { return FORMA_LABELS[forma] || forma.toUpperCase(); }
+function formaTagClass(forma) { return `tag-${forma.replaceAll('_','-')}`; }
+function isSaidaBeneficio(s) { return BENEFIT_FORMS.includes(s.forma); }
+function isEntradaBeneficio(e) {
+  const cat = (e.categoria || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  return cat.includes('vale') || cat.includes('beneficio') || cat.includes('alimentacao') || cat.includes('refeicao');
+}
 function sumBy(arr, keyFn, valueFn) {
   return arr.reduce((acc, item) => {
     const key = keyFn(item) || 'Sem categoria';
@@ -940,15 +1094,50 @@ function addCategory(type) {
   const val = document.getElementById(inputId).value.trim();
   if(!val) return;
   data.categorias[type].push(val);
+  if(type === 'saida' && !data.subcategorias.saida[val]) data.subcategorias.saida[val] = [];
   document.getElementById(inputId).value = '';
   save(); renderChips(); refreshSelects();
 }
-function removeCategory(type, idx) { data.categorias[type].splice(idx,1); save(); renderChips(); refreshSelects(); }
+function removeCategory(type, idx) {
+  const removed = data.categorias[type][idx];
+  data.categorias[type].splice(idx,1);
+  if(type === 'saida') delete data.subcategorias.saida[removed];
+  save(); renderChips(); refreshSelects();
+}
 function renderChips() {
   ['entrada','saida','invest'].forEach(type => {
     document.getElementById('chips-'+type).innerHTML = data.categorias[type].map((c,i) =>
       `<span class="chip">${c}<span class="remove" onclick="removeCategory('${type}',${i})">×</span></span>`).join('');
   });
+  renderSubcategoryChips();
+}
+function getSubcategoriasSaida(categoria) {
+  return sortCategorias((data.subcategorias?.saida?.[categoria] || []).filter(Boolean));
+}
+function addSubcategory() {
+  const cat = document.getElementById('subcatSaidaCat').value;
+  const val = document.getElementById('newSaidaSubcat').value.trim();
+  if(!cat || !val) return;
+  if(!data.subcategorias.saida[cat]) data.subcategorias.saida[cat] = [];
+  if(!data.subcategorias.saida[cat].includes(val)) data.subcategorias.saida[cat].push(val);
+  document.getElementById('newSaidaSubcat').value = '';
+  save(); renderSubcategoryChips(); refreshSelects();
+}
+function removeSubcategory(cat, sub) {
+  if(!data.subcategorias.saida[cat]) return;
+  data.subcategorias.saida[cat] = data.subcategorias.saida[cat].filter(s => s !== sub);
+  save(); renderSubcategoryChips(); refreshSelects();
+}
+function renderSubcategoryChips() {
+  const select = document.getElementById('subcatSaidaCat');
+  const chips = document.getElementById('chips-subcat-saida');
+  if(!select || !chips) return;
+  const current = select.value;
+  select.innerHTML = sortCategorias(data.categorias.saida).map(c=>`<option value="${c}">${c}</option>`).join('');
+  if(current && data.categorias.saida.includes(current)) select.value = current;
+  const cat = select.value;
+  chips.innerHTML = getSubcategoriasSaida(cat).map(sub =>
+    `<span class="chip">${sub}<span class="remove" onclick='removeSubcategory(${JSON.stringify(cat)},${JSON.stringify(sub)})'>×</span></span>`).join('') || '<span style="font-size:0.85rem;color:var(--muted)">Sem subcategorias para esta categoria.</span>';
 }
 function addCard() {
   const name = document.getElementById('newCardName').value.trim();
@@ -996,12 +1185,33 @@ function refreshSelects() {
   fillFilter('filtroEntradaCat', data.categorias.entrada);
   fillFilter('filtroSaidaCat', data.categorias.saida);
   fillFilter('filtroInvestCat', data.categorias.invest);
+  updateSaidaSubcatOptions();
+  updateFiltroSaidaSubcatOptions();
+  renderSubcategoryChips();
   // Cartão recorrente
   const recCartao = document.getElementById('recCartao');
   if(recCartao) { recCartao.innerHTML='<option value="">-</option>'+data.cartoes.map(c=>`<option value="${c.name}">${c.name}</option>`).join(''); }
 }
 function toggleParcelas() {
   document.getElementById('cartaoGroup').style.display = document.getElementById('saidaForma').value==='cartao'?'flex':'none';
+}
+function fillSubcategorySelect(id, categoria, includeAll, selected = '') {
+  const select = document.getElementById(id);
+  if(!select) return;
+  const subs = getSubcategoriasSaida(categoria);
+  const first = includeAll ? '<option value="">Todas</option>' : '<option value="">Sem subcategoria</option>';
+  select.innerHTML = first + subs.map(s=>`<option value="${s}">${s}</option>`).join('');
+  select.disabled = !includeAll && subs.length === 0;
+  select.value = selected && subs.includes(selected) ? selected : '';
+}
+function updateSaidaSubcatOptions(selected = '') {
+  fillSubcategorySelect('saidaSubcat', document.getElementById('saidaCat')?.value, false, selected);
+}
+function updateFiltroSaidaSubcatOptions(selected = '') {
+  fillSubcategorySelect('filtroSaidaSubcat', document.getElementById('filtroSaidaCat')?.value, true, selected);
+}
+function categoriaDespesaLabel(s) {
+  return s.subcategoria ? `${s.categoria} / ${s.subcategoria}` : s.categoria;
 }
 
 // ENTRADAS
@@ -1076,6 +1286,7 @@ function calcCompetenciaCartao(dataCompra, cartao, parcelaIdx) {
 function addSaida() {
   const dt = document.getElementById('saidaData').value;
   const cat = document.getElementById('saidaCat').value;
+  const subcat = document.getElementById('saidaSubcat').value;
   const desc = document.getElementById('saidaDesc').value.trim();
   const valorTotal = parseFloat(document.getElementById('saidaValor').value);
   const forma = document.getElementById('saidaForma').value;
@@ -1096,7 +1307,7 @@ function addSaida() {
       d.setMonth(d.getMonth() + i);
       competencia = d.toISOString().slice(0,10);
     }
-    data.saidas.push({ id: groupId+i, groupId, data:dt, competencia, categoria:cat, descricao:desc, valor:valorParcela, forma, cartao:forma==='cartao'?cartaoNome:'', parcela: parcelas>1?`${i+1}/${parcelas}`:'' });
+    data.saidas.push({ id: groupId+i, groupId, data:dt, competencia, categoria:cat, subcategoria:subcat, descricao:desc, valor:valorParcela, forma, cartao:forma==='cartao'?cartaoNome:'', parcela: parcelas>1?`${i+1}/${parcelas}`:'' });
   }
   document.getElementById('saidaDesc').value=''; document.getElementById('saidaValor').value=''; document.getElementById('saidaParcelas').value='1';
   save(); renderSaidas();
@@ -1106,6 +1317,7 @@ function removeSaidaGroup(groupId) { if(!confirmDelete('essa despesa (todas as p
 function clearFiltrosSaida() {
   document.getElementById('filtroSaidaTexto').value='';
   document.getElementById('filtroSaidaCat').value='';
+  document.getElementById('filtroSaidaSubcat').value='';
   document.getElementById('filtroSaidaForma').value='';
   document.getElementById('filtroSaidaCompraDe').value='';
   document.getElementById('filtroSaidaCompraAte').value='';
@@ -1117,13 +1329,15 @@ function getFilteredSaidas() {
   let filtered = [...data.saidas];
   const texto = (document.getElementById('filtroSaidaTexto').value||'').toLowerCase();
   const cat = document.getElementById('filtroSaidaCat').value;
+  const subcat = document.getElementById('filtroSaidaSubcat').value;
   const forma = document.getElementById('filtroSaidaForma').value;
   const compraDe = document.getElementById('filtroSaidaCompraDe').value;
   const compraAte = document.getElementById('filtroSaidaCompraAte').value;
   const de = document.getElementById('filtroSaidaDe').value; // yyyy-MM
   const ate = document.getElementById('filtroSaidaAte').value;
-  if(texto) filtered = filtered.filter(s=>s.descricao.toLowerCase().includes(texto)||s.categoria.toLowerCase().includes(texto));
+  if(texto) filtered = filtered.filter(s=>s.descricao.toLowerCase().includes(texto)||s.categoria.toLowerCase().includes(texto)||(s.subcategoria||'').toLowerCase().includes(texto));
   if(cat) filtered = filtered.filter(s=>s.categoria===cat);
+  if(subcat) filtered = filtered.filter(s=>(s.subcategoria||'')===subcat);
   if(forma) filtered = filtered.filter(s=>s.forma===forma);
   if(compraDe) filtered = filtered.filter(s=>s.data.slice(0,7)>=compraDe);
   if(compraAte) filtered = filtered.filter(s=>s.data.slice(0,7)<=compraAte);
@@ -1132,10 +1346,10 @@ function getFilteredSaidas() {
   return filtered;
 }
 function renderSaidas() {
-  const formaTag = f => `<span class="tag tag-${f}">${f.toUpperCase()}</span>`;
+  const formaTag = f => `<span class="tag ${formaTagClass(f)}">${formaLabel(f)}</span>`;
   const filtered = getFilteredSaidas();
   document.querySelector('#saidas-table tbody').innerHTML = applySort(filtered, 'saidas').map(s =>
-    `<tr data-id="${s.id}"><td>${fmtDate(s.data)}</td><td>${fmtDate(s.competencia)}</td><td>${s.categoria}</td><td>${s.descricao}</td><td>${fmt(s.valor)}</td><td>${formaTag(s.forma)}${s.cartao?' '+s.cartao:''}</td><td>${s.parcela?'<span class="parcela-info">'+s.parcela+'</span>':'-'}</td><td><button class="btn btn-primary" onclick="editSaida(${s.id})" style="padding:4px 8px">✎</button> <button class="btn btn-danger" onclick="removeSaidaGroup(${s.groupId})">×</button></td></tr>`).join('');
+    `<tr data-id="${s.id}"><td>${fmtDate(s.data)}</td><td>${fmtDate(s.competencia)}</td><td>${s.categoria}</td><td>${s.subcategoria||'-'}</td><td>${s.descricao}</td><td>${fmt(s.valor)}</td><td>${formaTag(s.forma)}${s.cartao?' '+s.cartao:''}</td><td>${s.parcela?'<span class="parcela-info">'+s.parcela+'</span>':'-'}</td><td><button class="btn btn-primary" onclick="editSaida(${s.id})" style="padding:4px 8px">✎</button> <button class="btn btn-danger" onclick="removeSaidaGroup(${s.groupId})">×</button></td></tr>`).join('');
   const total = filtered.reduce((s,e)=>s+e.valor,0);
   document.getElementById('saidas-summary').textContent = `${filtered.length} registro(s) | Total: ${fmt(total)}`;
   updateSortHeaders('saidas');
@@ -1144,12 +1358,20 @@ function editSaida(id) {
   const s = data.saidas.find(x=>x.id===id); if(!s) return;
   const row = document.querySelector(`#saidas-table tbody tr[data-id="${id}"]`);
   const cats = data.categorias.saida.map(c=>`<option value="${c}" ${c===s.categoria?'selected':''}>${c}</option>`).join('');
-  row.innerHTML = `<td>${fmtDate(s.data)}</td><td><input type="date" value="${s.competencia}" id="edit-sai-comp-${id}"></td><td><select id="edit-sai-cat-${id}">${cats}</select></td><td><input type="text" value="${s.descricao}" id="edit-sai-desc-${id}"></td><td><input type="number" step="0.01" value="${s.valor}" id="edit-sai-val-${id}" style="width:100px"></td><td colspan="2">${s.forma}${s.cartao?' '+s.cartao:''} ${s.parcela||''}</td><td><button class="btn btn-success" onclick="saveSaida(${id})">✓</button> <button class="btn" style="background:#546e7a;color:#fff" onclick="renderSaidas()">✗</button></td>`;
+  const subcats = ['<option value="">Sem subcategoria</option>', ...getSubcategoriasSaida(s.categoria).map(sub=>`<option value="${sub}" ${sub===(s.subcategoria||'')?'selected':''}>${sub}</option>`)].join('');
+  row.innerHTML = `<td>${fmtDate(s.data)}</td><td><input type="date" value="${s.competencia}" id="edit-sai-comp-${id}"></td><td><select id="edit-sai-cat-${id}" onchange="updateEditSaidaSubcatOptions(${id})">${cats}</select></td><td><select id="edit-sai-subcat-${id}">${subcats}</select></td><td><input type="text" value="${s.descricao}" id="edit-sai-desc-${id}"></td><td><input type="number" step="0.01" value="${s.valor}" id="edit-sai-val-${id}" style="width:100px"></td><td colspan="2">${formaLabel(s.forma)}${s.cartao?' '+s.cartao:''} ${s.parcela||''}</td><td><button class="btn btn-success" onclick="saveSaida(${id})">✓</button> <button class="btn" style="background:#546e7a;color:#fff" onclick="renderSaidas()">✗</button></td>`;
+}
+function updateEditSaidaSubcatOptions(id) {
+  const cat = document.getElementById(`edit-sai-cat-${id}`).value;
+  const select = document.getElementById(`edit-sai-subcat-${id}`);
+  if(!select) return;
+  select.innerHTML = '<option value="">Sem subcategoria</option>' + getSubcategoriasSaida(cat).map(sub=>`<option value="${sub}">${sub}</option>`).join('');
 }
 function saveSaida(id) {
   const s = data.saidas.find(x=>x.id===id); if(!s) return;
   const novaComp = document.getElementById(`edit-sai-comp-${id}`).value;
   s.categoria = document.getElementById(`edit-sai-cat-${id}`).value;
+  s.subcategoria = document.getElementById(`edit-sai-subcat-${id}`).value;
   s.descricao = document.getElementById(`edit-sai-desc-${id}`).value;
   s.valor = parseFloat(document.getElementById(`edit-sai-val-${id}`).value)||0;
 
@@ -1248,15 +1470,21 @@ function getMonthData(year, month) {
   const aportes = data.investimentos.filter(i=>i.data.startsWith(prefix)&&i.tipo==='aporte');
   const resgates = data.investimentos.filter(i=>i.data.startsWith(prefix)&&i.tipo==='resgate');
   const totalEntradas = entradas.reduce((s,e)=>s+e.valor,0);
+  const totalBeneficiosEntrada = entradas.filter(isEntradaBeneficio).reduce((s,e)=>s+e.valor,0);
+  const totalEntradasDinheiro = totalEntradas - totalBeneficiosEntrada;
   const totalSaidas = saidas.reduce((s,e)=>s+e.valor,0);
+  const totalSaidasBeneficios = saidas.filter(isSaidaBeneficio).reduce((s,e)=>s+e.valor,0);
+  const totalSaidasDinheiro = totalSaidas - totalSaidasBeneficios;
   const totalAportes = aportes.reduce((s,e)=>s+e.valor,0);
   const totalResgates = resgates.reduce((s,e)=>s+e.valor,0);
   const saldo = totalEntradas - totalSaidas - totalAportes + totalResgates;
-  return { entradas, saidas, aportes, resgates, totalEntradas, totalSaidas, totalAportes, totalResgates, saldo };
+  const saldoLivre = totalEntradasDinheiro - totalSaidasDinheiro - totalAportes + totalResgates;
+  const saldoBeneficios = totalBeneficiosEntrada - totalSaidasBeneficios;
+  return { entradas, saidas, aportes, resgates, totalEntradas, totalBeneficiosEntrada, totalEntradasDinheiro, totalSaidas, totalSaidasBeneficios, totalSaidasDinheiro, totalAportes, totalResgates, saldo, saldoLivre, saldoBeneficios };
 }
 
 function calcSaldoAcumuladoAte(year, month) {
-  if(!data.entradas.length && !data.saidas.length) return 0;
+  if(!data.entradas.length && !data.saidas.length && !data.investimentos.length) return 0;
   const todasDatas = [
     ...data.entradas.map(e=>e.data.slice(0,7)),
     ...data.saidas.map(s=>(dashVisao==='compra'?s.data:s.competencia).slice(0,7)),
@@ -1268,11 +1496,92 @@ function calcSaldoAcumuladoAte(year, month) {
   let y = iniYear, m = iniMonth - 1;
   while(y < year || (y === year && m < month)) {
     const d = getMonthData(y, m);
-    saldo += d.saldo;
+    saldo += d.saldoLivre;
     m++;
     if(m > 11) { m = 0; y++; }
   }
   return saldo;
+}
+
+function calcSaldoBeneficiosAcumuladoAte(year, month) {
+  if(!data.entradas.length && !data.saidas.length) return 0;
+  const todasDatas = [
+    ...data.entradas.map(e=>e.data.slice(0,7)),
+    ...data.saidas.map(s=>(dashVisao==='compra'?s.data:s.competencia).slice(0,7))
+  ].filter(Boolean).sort();
+  if(!todasDatas.length) return 0;
+  const [iniYear, iniMonth] = todasDatas[0].split('-').map(Number);
+  let saldo = 0;
+  let y = iniYear, m = iniMonth - 1;
+  while(y < year || (y === year && m < month)) {
+    const d = getMonthData(y, m);
+    saldo += d.saldoBeneficios;
+    m++;
+    if(m > 11) { m = 0; y++; }
+  }
+  return saldo;
+}
+
+function renderHome() {
+  const now = new Date();
+  const month = now.getMonth();
+  const year = now.getFullYear();
+  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const cur = getMonthData(year, month);
+  const saldoAnterior = calcSaldoAcumuladoAte(year, month);
+  const saldoBeneficiosAnterior = calcSaldoBeneficiosAcumuladoAte(year, month);
+  const saldoProjetado = saldoAnterior + cur.saldoLivre;
+  const saldoBeneficiosAcumulado = saldoBeneficiosAnterior + cur.saldoBeneficios;
+  const taxaPoupanca = cur.totalEntradasDinheiro > 0 ? Math.round(((cur.totalAportes - cur.totalResgates) / cur.totalEntradasDinheiro) * 100) : 0;
+  const rendaComprometida = cur.totalEntradasDinheiro > 0 ? Math.round((cur.totalSaidasDinheiro / cur.totalEntradasDinheiro) * 100) : 0;
+  const patrimonioMes = cur.totalAportes - cur.totalResgates;
+  const hasData = cur.totalEntradas > 0 || cur.totalSaidas > 0 || cur.totalAportes > 0 || cur.totalResgates > 0;
+
+  document.getElementById('home-title').textContent = `${meses[month]} de ${year}`;
+  document.getElementById('home-subtitle').textContent = hasData
+    ? `Entradas, saídas, benefícios e investimentos consolidados para o mês atual.`
+    : `Comece registrando entradas, saídas e investimentos para montar sua visão do mês.`;
+
+  const health = saldoProjetado >= 0 && rendaComprometida <= 70 ? 'Mês sob controle' : saldoProjetado >= 0 ? 'Atenção ao consumo' : 'Saldo projetado negativo';
+  const healthColor = saldoProjetado >= 0 && rendaComprometida <= 70 ? 'var(--positive)' : saldoProjetado >= 0 ? 'var(--warning-text)' : 'var(--negative)';
+  const healthEl = document.getElementById('home-health-pill');
+  healthEl.textContent = health;
+  healthEl.style.color = healthColor;
+  document.getElementById('home-saldo-projetado').textContent = fmt(saldoProjetado);
+  document.getElementById('home-saldo-projetado').className = `card-value ${saldoProjetado>=0?'positive':'negative'}`;
+  document.getElementById('home-taxa-poupanca').textContent = `${taxaPoupanca}%`;
+  document.getElementById('home-taxa-poupanca').className = `card-value ${taxaPoupanca>=0?'positive':'negative'}`;
+
+  document.getElementById('home-cards').innerHTML = `
+    <div class="card"><div class="card-label">Saldo Anterior</div><div class="card-value ${saldoAnterior>=0?'positive':'negative'}">${fmt(saldoAnterior)}</div></div>
+    <div class="card"><div class="card-label">Entradas Dinheiro</div><div class="card-value positive">${fmt(cur.totalEntradasDinheiro)}</div></div>
+    <div class="card"><div class="card-label">Saídas Dinheiro</div><div class="card-value negative">${fmt(cur.totalSaidasDinheiro)}</div></div>
+    <div class="card"><div class="card-label">Saldo Benefícios</div><div class="card-value ${saldoBeneficiosAcumulado>=0?'positive':'negative'}">${fmt(saldoBeneficiosAcumulado)}</div></div>
+    <div class="card"><div class="card-label">Investimento Líquido</div><div class="card-value ${patrimonioMes>=0?'positive':'negative'}">${fmt(patrimonioMes)}</div></div>
+    <div class="card"><div class="card-label">Renda Comprometida</div><div class="card-value ${rendaComprometida>80?'negative':rendaComprometida>60?'neutral':'positive'}">${rendaComprometida}%</div></div>
+  `;
+
+  const composicao = [
+    ['Entradas dinheiro', cur.totalEntradasDinheiro, '#22c55e'],
+    ['Benefícios recebidos', cur.totalBeneficiosEntrada, '#4fc3f7'],
+    ['Saídas dinheiro', cur.totalSaidasDinheiro, '#ef5350'],
+    ['Uso benefícios', cur.totalSaidasBeneficios, '#ffb74d'],
+    ['Aportes', cur.totalAportes, '#3b82f6']
+  ].filter(([,value]) => value > 0);
+  const maxComp = Math.max(...composicao.map(([,value]) => value), 1);
+  document.getElementById('home-composicao').innerHTML = composicao.map(([label,value,color]) =>
+    `<div class="bar-row"><div class="bar-label">${label}</div><div class="bar-track"><div class="bar-fill" style="width:${(value/maxComp*100)}%;background:${color}">${fmt(value)}</div></div></div>`
+  ).join('') || '<div class="home-empty">Sem movimentações no mês atual</div>';
+
+  const movimentos = [
+    ...cur.entradas.map(e => ({tipo:'Entrada', label:e.descricao || e.categoria, valor:e.valor, cls:'positive'})),
+    ...cur.saidas.map(s => ({tipo:'Saída', label:s.descricao ? `${s.descricao} · ${categoriaDespesaLabel(s)}` : categoriaDespesaLabel(s), valor:s.valor, cls:'negative'})),
+    ...cur.aportes.map(i => ({tipo:'Aporte', label:i.descricao || i.categoria, valor:i.valor, cls:'neutral'})),
+    ...cur.resgates.map(i => ({tipo:'Resgate', label:i.descricao || i.categoria, valor:i.valor, cls:'positive'}))
+  ].sort((a,b)=>b.valor-a.valor).slice(0,5);
+  document.getElementById('home-movimentos').innerHTML = movimentos.map(m =>
+    `<div class="home-list-item"><div><div class="home-list-label">${m.tipo}</div><strong>${m.label}</strong></div><div class="home-list-value ${m.cls}">${fmt(m.valor)}</div></div>`
+  ).join('') || '<div class="home-empty">Nenhum movimento registrado neste mês</div>';
 }
 
 function renderDashboardMensal() {
@@ -1281,7 +1590,9 @@ function renderDashboardMensal() {
   const cur = getMonthData(year, month);
 
   const saldoAnterior = calcSaldoAcumuladoAte(year, month);
-  const saldoAcumulado = saldoAnterior + cur.saldo;
+  const saldoBeneficiosAnterior = calcSaldoBeneficiosAcumuladoAte(year, month);
+  const saldoAcumulado = saldoAnterior + cur.saldoLivre;
+  const saldoBeneficiosAcumulado = saldoBeneficiosAnterior + cur.saldoBeneficios;
 
   // Mês anterior (para comparativo)
   let prevMonth = month - 1, prevYear = year;
@@ -1289,15 +1600,18 @@ function renderDashboardMensal() {
   const prev = getMonthData(prevYear, prevMonth);
 
   // Cards
-  const pctUsado = cur.totalEntradas > 0 ? Math.round((cur.totalSaidas / cur.totalEntradas) * 100) : 0;
-  const taxaPoupanca = cur.totalEntradas > 0 ? Math.round(((cur.totalAportes - cur.totalResgates) / cur.totalEntradas) * 100) : 0;
+  const pctUsado = cur.totalEntradasDinheiro > 0 ? Math.round((cur.totalSaidasDinheiro / cur.totalEntradasDinheiro) * 100) : 0;
+  const taxaPoupanca = cur.totalEntradasDinheiro > 0 ? Math.round(((cur.totalAportes - cur.totalResgates) / cur.totalEntradasDinheiro) * 100) : 0;
   document.getElementById('mensal-cards').innerHTML = `
     <div class="card"><div class="card-label">Saldo Anterior</div><div class="card-value ${saldoAnterior>=0?'positive':'negative'}">${fmt(saldoAnterior)}</div></div>
-    <div class="card"><div class="card-label">Entradas</div><div class="card-value positive">${fmt(cur.totalEntradas)}</div></div>
-    <div class="card"><div class="card-label">Saídas</div><div class="card-value negative">${fmt(cur.totalSaidas)}</div></div>
+    <div class="card"><div class="card-label">Entradas Dinheiro</div><div class="card-value positive">${fmt(cur.totalEntradasDinheiro)}</div></div>
+    <div class="card"><div class="card-label">Benefícios Recebidos</div><div class="card-value neutral">${fmt(cur.totalBeneficiosEntrada)}</div></div>
+    <div class="card"><div class="card-label">Saídas Dinheiro</div><div class="card-value negative">${fmt(cur.totalSaidasDinheiro)}</div></div>
+    <div class="card"><div class="card-label">Uso Benefícios</div><div class="card-value neutral">${fmt(cur.totalSaidasBeneficios)}</div></div>
     <div class="card"><div class="card-label">Aportes</div><div class="card-value negative">${fmt(cur.totalAportes)}</div></div>
     <div class="card"><div class="card-label">Resgates</div><div class="card-value positive">${fmt(cur.totalResgates)}</div></div>
-    <div class="card"><div class="card-label">Saldo do Mês</div><div class="card-value ${cur.saldo>=0?'positive':'negative'}">${fmt(cur.saldo)}</div></div>
+    <div class="card"><div class="card-label">Saldo Livre do Mês</div><div class="card-value ${cur.saldoLivre>=0?'positive':'negative'}">${fmt(cur.saldoLivre)}</div></div>
+    <div class="card"><div class="card-label">Saldo Benefícios</div><div class="card-value ${saldoBeneficiosAcumulado>=0?'positive':'negative'}">${fmt(saldoBeneficiosAcumulado)}</div></div>
     <div class="card"><div class="card-label">Saldo Acumulado</div><div class="card-value ${saldoAcumulado>=0?'positive':'negative'}" style="font-size:1.7rem">${fmt(saldoAcumulado)}</div></div>
     <div class="card"><div class="card-label">% Renda Comprometida</div><div class="card-value ${pctUsado>80?'negative':pctUsado>60?'neutral':'positive'}">${pctUsado}%</div></div>
     <div class="card"><div class="card-label">Taxa de Poupança</div><div class="card-value ${taxaPoupanca>0?'positive':'negative'}">${taxaPoupanca}%</div></div>
@@ -1328,7 +1642,7 @@ function renderDashboardMensal() {
 
   // Despesas por categoria com %
   const byCat = {};
-  cur.saidas.forEach(s => { byCat[s.categoria] = (byCat[s.categoria]||0)+s.valor; });
+  cur.saidas.forEach(s => { const label = categoriaDespesaLabel(s); byCat[label] = (byCat[label]||0)+s.valor; });
   const maxCat = Math.max(...Object.values(byCat),1);
   document.getElementById('mensal-cat-chart').innerHTML = Object.entries(byCat).sort((a,b)=>b[1]-a[1]).map(([cat,val]) => {
     const pct = cur.totalSaidas>0 ? Math.round(val/cur.totalSaidas*100) : 0;
@@ -1347,42 +1661,42 @@ function renderDashboardMensal() {
   const byForma = {};
   cur.saidas.forEach(s => { byForma[s.forma] = (byForma[s.forma]||0)+s.valor; });
   const maxForma = Math.max(...Object.values(byForma),1);
-  const formaColors = {cartao:'#b388ff',pix:'#4dd0e1',boleto:'#ffb74d',debito:'#81c784'};
+  const formaColors = {cartao:'#b388ff',pix:'#4dd0e1',boleto:'#ffb74d',debito:'#81c784',vale_alimentacao:'#22c55e',vale_refeicao:'#16a34a'};
   document.getElementById('mensal-forma-chart').innerHTML = Object.entries(byForma).sort((a,b)=>b[1]-a[1]).map(([f,val]) =>
-    `<div class="bar-row"><div class="bar-label">${f.toUpperCase()}</div><div class="bar-track"><div class="bar-fill" style="width:${(val/maxForma*100)}%;background:${formaColors[f]||'#4fc3f7'}">${fmt(val)}</div></div></div>`
+    `<div class="bar-row"><div class="bar-label">${formaLabel(f)}</div><div class="bar-track"><div class="bar-fill" style="width:${(val/maxForma*100)}%;background:${formaColors[f]||'#4fc3f7'}">${fmt(val)}</div></div></div>`
   ).join('') || '';
 
   // Top 5 maiores despesas
   const top5 = [...cur.saidas].sort((a,b)=>b.valor-a.valor).slice(0,5);
-  document.getElementById('mensal-top5').innerHTML = top5.length ? `<table><thead><tr><th>Descrição</th><th>Categoria</th><th>Valor</th></tr></thead><tbody>${top5.map(s=>`<tr><td>${s.descricao||'-'}</td><td>${s.categoria}</td><td>${fmt(s.valor)}</td></tr>`).join('')}</tbody></table>` : '<p style="color:#546e7a">Sem despesas</p>';
+  document.getElementById('mensal-top5').innerHTML = top5.length ? `<table><thead><tr><th>Descrição</th><th>Categoria</th><th>Valor</th></tr></thead><tbody>${top5.map(s=>`<tr><td>${s.descricao||'-'}</td><td>${categoriaDespesaLabel(s)}</td><td>${fmt(s.valor)}</td></tr>`).join('')}</tbody></table>` : '<p style="color:#546e7a">Sem despesas</p>';
 
   // Comparativo mês anterior
   const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  const varSaida = prev.totalSaidas>0 ? ((cur.totalSaidas - prev.totalSaidas)/prev.totalSaidas*100).toFixed(1) : '-';
-  const varEntrada = prev.totalEntradas>0 ? ((cur.totalEntradas - prev.totalEntradas)/prev.totalEntradas*100).toFixed(1) : '-';
+  const varSaida = prev.totalSaidasDinheiro>0 ? ((cur.totalSaidasDinheiro - prev.totalSaidasDinheiro)/prev.totalSaidasDinheiro*100).toFixed(1) : '-';
+  const varEntrada = prev.totalEntradasDinheiro>0 ? ((cur.totalEntradasDinheiro - prev.totalEntradasDinheiro)/prev.totalEntradasDinheiro*100).toFixed(1) : '-';
   const arrow = (v) => v==='-'?'—':parseFloat(v)>0?`<span style="color:#ef5350">▲ ${v}%</span>`:`<span style="color:#66bb6a">▼ ${Math.abs(parseFloat(v))}%</span>`;
   const arrowPositive = (v) => v==='-'?'—':parseFloat(v)>0?`<span style="color:#66bb6a">▲ ${v}%</span>`:`<span style="color:#ef5350">▼ ${Math.abs(parseFloat(v))}%</span>`;
   document.getElementById('mensal-comparativo').innerHTML = `
     <table><thead><tr><th></th><th>${meses[prevMonth]}/${prevYear}</th><th>${meses[month]}/${year}</th><th>Variação</th></tr></thead>
     <tbody>
-    <tr><td>Entradas</td><td>${fmt(prev.totalEntradas)}</td><td>${fmt(cur.totalEntradas)}</td><td>${arrowPositive(varEntrada)}</td></tr>
-    <tr><td>Saídas</td><td>${fmt(prev.totalSaidas)}</td><td>${fmt(cur.totalSaidas)}</td><td>${arrow(varSaida)}</td></tr>
-    <tr><td>Saldo</td><td style="color:${prev.saldo>=0?'#66bb6a':'#ef5350'}">${fmt(prev.saldo)}</td><td style="color:${cur.saldo>=0?'#66bb6a':'#ef5350'}">${fmt(cur.saldo)}</td><td></td></tr>
+    <tr><td>Entradas Dinheiro</td><td>${fmt(prev.totalEntradasDinheiro)}</td><td>${fmt(cur.totalEntradasDinheiro)}</td><td>${arrowPositive(varEntrada)}</td></tr>
+    <tr><td>Saídas Dinheiro</td><td>${fmt(prev.totalSaidasDinheiro)}</td><td>${fmt(cur.totalSaidasDinheiro)}</td><td>${arrow(varSaida)}</td></tr>
+    <tr><td>Saldo Livre</td><td style="color:${prev.saldoLivre>=0?'#66bb6a':'#ef5350'}">${fmt(prev.saldoLivre)}</td><td style="color:${cur.saldoLivre>=0?'#66bb6a':'#ef5350'}">${fmt(cur.saldoLivre)}</td><td></td></tr>
     </tbody></table>
   `;
 
   // PROJEÇÃO DO MÊS
   const now = new Date();
   const isCurrentMonth = (now.getMonth()===month && now.getFullYear()===year);
-  if(isCurrentMonth && cur.totalSaidas > 0) {
+  if(isCurrentMonth && cur.totalSaidasDinheiro > 0) {
     const diaAtual = now.getDate();
     const diasNoMes = new Date(year, month+1, 0).getDate();
-    const mediaDiaria = cur.totalSaidas / diaAtual;
+    const mediaDiaria = cur.totalSaidasDinheiro / diaAtual;
     const projecao = mediaDiaria * diasNoMes;
     const pctPassou = Math.round(diaAtual/diasNoMes*100);
     document.getElementById('mensal-projecao').innerHTML = `
       <div class="cards-grid" style="margin:0">
-        <div class="card"><div class="card-label">Gasto até dia ${diaAtual}</div><div class="card-value negative">${fmt(cur.totalSaidas)}</div></div>
+        <div class="card"><div class="card-label">Gasto dinheiro até dia ${diaAtual}</div><div class="card-value negative">${fmt(cur.totalSaidasDinheiro)}</div></div>
         <div class="card"><div class="card-label">Média/dia</div><div class="card-value neutral">${fmt(mediaDiaria)}</div></div>
         <div class="card"><div class="card-label">Projeção fim do mês</div><div class="card-value negative">${fmt(projecao)}</div></div>
         <div class="card"><div class="card-label">Mês decorrido</div><div class="card-value neutral">${pctPassou}%</div></div>
@@ -1394,14 +1708,14 @@ function renderDashboardMensal() {
   // ALERTAS - categorias acima da média dos últimos 3 meses
   const alertas = [];
   const byCatCurrent = {};
-  cur.saidas.forEach(s => { byCatCurrent[s.categoria] = (byCatCurrent[s.categoria]||0)+s.valor; });
+  cur.saidas.forEach(s => { const label = categoriaDespesaLabel(s); byCatCurrent[label] = (byCatCurrent[label]||0)+s.valor; });
   Object.entries(byCatCurrent).forEach(([cat, valAtual]) => {
     let soma3 = 0, mesesCont = 0;
     for(let i=1;i<=3;i++) {
       let pm = month-i, py = year;
       while(pm<0){pm+=12;py--;}
       const pf = `${py}-${String(pm+1).padStart(2,'0')}`;
-      const valMes = data.saidas.filter(s=>s.competencia.startsWith(pf)&&s.categoria===cat).reduce((s,e)=>s+e.valor,0);
+      const valMes = data.saidas.filter(s=>s.competencia.startsWith(pf)&&categoriaDespesaLabel(s)===cat).reduce((s,e)=>s+e.valor,0);
       if(valMes>0){soma3+=valMes; mesesCont++;}
     }
     if(mesesCont>0) {
@@ -1418,8 +1732,10 @@ function renderDashboardMensal() {
 
   // METAS POR CATEGORIA
   if(data.metas.length > 0) {
+    const byCatMetas = {};
+    cur.saidas.forEach(s => { byCatMetas[s.categoria] = (byCatMetas[s.categoria]||0)+s.valor; });
     document.getElementById('mensal-metas').innerHTML = data.metas.map(m => {
-      const gasto = byCatCurrent[m.categoria] || 0;
+      const gasto = byCatMetas[m.categoria] || 0;
       const pct = Math.min(Math.round(gasto/m.limite*100), 100);
       const color = pct >= 100 ? '#ef5350' : pct >= 80 ? '#ff9800' : '#66bb6a';
       return `<div class="gauge-row"><div class="gauge-label">${m.categoria}</div><div class="gauge-track"><div class="gauge-fill" style="width:${pct}%;background:${color}">${pct}%</div></div><div class="gauge-info">${fmt(gasto)} / ${fmt(m.limite)}</div></div>`;
@@ -1452,31 +1768,37 @@ function renderDashboardMensal() {
 function renderDashboardAnual() {
   const year = parseInt(document.getElementById('dashAnualYear').value);
   const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  let patrimonioAcum = 0, saldoAcum = 0;
+  let patrimonioAcum = 0, saldoAcum = 0, saldoBeneficiosAcum = calcSaldoBeneficiosAcumuladoAte(year, 0);
   let rows = [];
-  let totalEntradas=0, totalSaidas=0, totalAportes=0, totalResgates=0;
+  let totalEntradas=0, totalEntradasDinheiro=0, totalBeneficiosEntrada=0, totalSaidas=0, totalSaidasDinheiro=0, totalSaidasBeneficios=0, totalAportes=0, totalResgates=0;
   let mesesComDados = 0;
 
   for(let m=0;m<12;m++) {
     const d = getMonthData(year, m);
     patrimonioAcum += (d.totalAportes - d.totalResgates);
-    saldoAcum += d.saldo;
-    totalEntradas+=d.totalEntradas; totalSaidas+=d.totalSaidas; totalAportes+=d.totalAportes; totalResgates+=d.totalResgates;
+    saldoAcum += d.saldoLivre;
+    saldoBeneficiosAcum += d.saldoBeneficios;
+    totalEntradas+=d.totalEntradas; totalEntradasDinheiro+=d.totalEntradasDinheiro; totalBeneficiosEntrada+=d.totalBeneficiosEntrada; totalSaidas+=d.totalSaidas; totalSaidasDinheiro+=d.totalSaidasDinheiro; totalSaidasBeneficios+=d.totalSaidasBeneficios; totalAportes+=d.totalAportes; totalResgates+=d.totalResgates;
     if(d.totalEntradas>0||d.totalSaidas>0) mesesComDados++;
-    const taxaPoup = d.totalEntradas>0 ? Math.round((d.totalAportes-d.totalResgates)/d.totalEntradas*100) : 0;
-    rows.push({mes:meses[m], ent:d.totalEntradas, sai:d.totalSaidas, apo:d.totalAportes, res:d.totalResgates, saldo:d.saldo, patrimonio:patrimonioAcum, saldoAcum, taxaPoup});
+    const taxaPoup = d.totalEntradasDinheiro>0 ? Math.round((d.totalAportes-d.totalResgates)/d.totalEntradasDinheiro*100) : 0;
+    rows.push({mes:meses[m], ent:d.totalEntradasDinheiro, entTotal:d.totalEntradas, benEnt:d.totalBeneficiosEntrada, sai:d.totalSaidasDinheiro, saiTotal:d.totalSaidas, benSai:d.totalSaidasBeneficios, saldoBen:saldoBeneficiosAcum, apo:d.totalAportes, res:d.totalResgates, saldo:d.saldoLivre, patrimonio:patrimonioAcum, saldoAcum, taxaPoup});
   }
 
-  const saldoAnual = totalEntradas - totalSaidas - totalAportes + totalResgates;
-  const mediaEntradas = mesesComDados>0 ? totalEntradas/mesesComDados : 0;
-  const mediaSaidas = mesesComDados>0 ? totalSaidas/mesesComDados : 0;
-  const taxaPoupancaAnual = totalEntradas>0 ? Math.round((totalAportes-totalResgates)/totalEntradas*100) : 0;
+  const saldoAnual = totalEntradasDinheiro - totalSaidasDinheiro - totalAportes + totalResgates;
+  const saldoBeneficiosAnual = totalBeneficiosEntrada - totalSaidasBeneficios;
+  const saldoBeneficiosAcumulado = calcSaldoBeneficiosAcumuladoAte(year, 0) + saldoBeneficiosAnual;
+  const mediaEntradas = mesesComDados>0 ? totalEntradasDinheiro/mesesComDados : 0;
+  const mediaSaidas = mesesComDados>0 ? totalSaidasDinheiro/mesesComDados : 0;
+  const taxaPoupancaAnual = totalEntradasDinheiro>0 ? Math.round((totalAportes-totalResgates)/totalEntradasDinheiro*100) : 0;
 
   document.getElementById('anual-cards').innerHTML = `
-    <div class="card"><div class="card-label">Total Entradas</div><div class="card-value positive">${fmt(totalEntradas)}</div></div>
-    <div class="card"><div class="card-label">Total Saídas</div><div class="card-value negative">${fmt(totalSaidas)}</div></div>
+    <div class="card"><div class="card-label">Entradas Dinheiro</div><div class="card-value positive">${fmt(totalEntradasDinheiro)}</div></div>
+    <div class="card"><div class="card-label">Benefícios Recebidos</div><div class="card-value neutral">${fmt(totalBeneficiosEntrada)}</div></div>
+	    <div class="card"><div class="card-label">Saídas Dinheiro</div><div class="card-value negative">${fmt(totalSaidasDinheiro)}</div></div>
+	    <div class="card"><div class="card-label">Uso Benefícios</div><div class="card-value neutral">${fmt(totalSaidasBeneficios)}</div></div>
     <div class="card"><div class="card-label">Total Investido</div><div class="card-value neutral">${fmt(totalAportes)}</div></div>
-    <div class="card"><div class="card-label">Saldo Anual</div><div class="card-value ${saldoAnual>=0?'positive':'negative'}">${fmt(saldoAnual)}</div></div>
+    <div class="card"><div class="card-label">Saldo Livre Anual</div><div class="card-value ${saldoAnual>=0?'positive':'negative'}">${fmt(saldoAnual)}</div></div>
+    <div class="card"><div class="card-label">Saldo Benefícios</div><div class="card-value ${saldoBeneficiosAcumulado>=0?'positive':'negative'}">${fmt(saldoBeneficiosAcumulado)}</div></div>
     <div class="card"><div class="card-label">Patrimônio Investido</div><div class="card-value neutral">${fmt(patrimonioAcum)}</div></div>
     <div class="card"><div class="card-label">Média Entradas/mês</div><div class="card-value positive">${fmt(mediaEntradas)}</div></div>
     <div class="card"><div class="card-label">Média Saídas/mês</div><div class="card-value negative">${fmt(mediaSaidas)}</div></div>
@@ -1491,7 +1813,7 @@ function renderDashboardAnual() {
       <div class="bar-fill" style="width:${(r.ent/maxVs*50)}%;background:#66bb6a;border-radius:4px 0 0 4px">${r.ent>0?fmt(r.ent):''}</div>
       <div class="bar-fill" style="width:${(r.sai/maxVs*50)}%;background:#ef5350;border-radius:0 4px 4px 0">${r.sai>0?fmt(r.sai):''}</div>
     </div></div>`).join('')}</div>
-    <div style="margin-top:8px;font-size:0.75rem;color:#90a4ae"><span style="color:#66bb6a">■</span> Entradas &nbsp; <span style="color:#ef5350">■</span> Saídas</div>`;
+    <div style="margin-top:8px;font-size:0.75rem;color:#90a4ae"><span style="color:#66bb6a">■</span> Entradas dinheiro &nbsp; <span style="color:#ef5350">■</span> Saídas dinheiro</div>`;
 
   // Taxa de poupança mensal
   const maxPoup = Math.max(...rows.map(r=>Math.abs(r.taxaPoup)),1);
@@ -1515,7 +1837,7 @@ function renderDashboardAnual() {
     <div style="margin-top:8px;font-size:0.75rem;color:#90a4ae"><span style="color:#3b82f6">■</span> Aportes &nbsp; <span style="color:#f59e0b">■</span> Resgates</div>`;
 
   // Tabela evolução
-  document.getElementById('anual-evolution').innerHTML = `<table class="evolution-table"><thead><tr><th>Mês</th><th>Entradas</th><th>Saídas</th><th>Aportes</th><th>Resgates</th><th>Saldo</th><th>Poupança</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.mes}</td><td style="color:#66bb6a">${fmt(r.ent)}</td><td style="color:#ef5350">${fmt(r.sai)}</td><td style="color:#4fc3f7">${fmt(r.apo)}</td><td style="color:#81c784">${fmt(r.res)}</td><td style="color:${r.saldo>=0?'#66bb6a':'#ef5350'}">${fmt(r.saldo)}</td><td style="color:${r.taxaPoup>=0?'#66bb6a':'#ef5350'}">${r.taxaPoup}%</td></tr>`).join('')}</tbody></table>`;
+  document.getElementById('anual-evolution').innerHTML = `<table class="evolution-table"><thead><tr><th>Mês</th><th>Entradas Dinheiro</th><th>Benefícios</th><th>Saídas Dinheiro</th><th>Uso Benefícios</th><th>Saldo Benefícios</th><th>Aportes</th><th>Resgates</th><th>Saldo Livre</th><th>Poupança</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.mes}</td><td style="color:#66bb6a">${fmt(r.ent)}</td><td style="color:#4fc3f7">${fmt(r.benEnt)}</td><td style="color:#ef5350">${fmt(r.sai)}</td><td style="color:#ffb74d">${fmt(r.benSai)}</td><td style="color:${r.saldoBen>=0?'#66bb6a':'#ef5350'}">${fmt(r.saldoBen)}</td><td style="color:#4fc3f7">${fmt(r.apo)}</td><td style="color:#81c784">${fmt(r.res)}</td><td style="color:${r.saldo>=0?'#66bb6a':'#ef5350'}">${fmt(r.saldo)}</td><td style="color:${r.taxaPoup>=0?'#66bb6a':'#ef5350'}">${r.taxaPoup}%</td></tr>`).join('')}</tbody></table>`;
 
   // Saldo acumulado
   const maxSaldo = Math.max(...rows.map(r=>Math.abs(r.saldoAcum)),1);
@@ -1544,7 +1866,7 @@ function renderRecorrentes() {
   const tbody = document.querySelector('#recorrentes-table tbody');
   if(!tbody) return;
   tbody.innerHTML = applySort(data.recorrentes, 'recorrentes').map(r =>
-    `<tr><td>${r.descricao}</td><td>${r.categoria}</td><td>${fmt(r.valor)}</td><td>${r.dia}</td><td>${r.forma.toUpperCase()}${r.cartao?' - '+r.cartao:''}</td><td><button class="btn btn-danger" onclick="removeRecorrente(${r.id})">×</button></td></tr>`
+    `<tr><td>${r.descricao}</td><td>${r.categoria}</td><td>${fmt(r.valor)}</td><td>${r.dia}</td><td>${formaLabel(r.forma)}${r.cartao?' - '+r.cartao:''}</td><td><button class="btn btn-danger" onclick="removeRecorrente(${r.id})">×</button></td></tr>`
   ).join('');
   updateSortHeaders('recorrentes');
 }
@@ -1616,12 +1938,12 @@ function toggleTheme() {
 function init() {
   applyTheme(localStorage.getItem('orcamento_theme') || 'dark');
   document.body.classList.toggle('sidebar-collapsed', localStorage.getItem('orcamento_sidebar_collapsed') === '1');
-  updatePageHeader('config');
+  updatePageHeader('home');
   // Carrega dados do Google (async), atualiza quando chegar
   loadFromGoogle();
   // Renderiza com cache local imediatamente
   setupSortHeaders();
-  renderChips(); renderCards(); refreshSelects(); renderEntradas(); renderSaidas(); renderInvest(); renderRecorrentes(); renderMetas();
+  renderHome(); renderChips(); renderCards(); refreshSelects(); renderEntradas(); renderSaidas(); renderInvest(); renderRecorrentes(); renderMetas();
   const now = new Date();
   document.getElementById('dashMonth').value = now.getMonth();
   document.getElementById('dashYear').value = now.getFullYear();
